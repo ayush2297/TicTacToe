@@ -17,8 +17,21 @@ function reset_the_board(){
 	done
 }
 
+function toss_to_decide_who_plays_first(){
+	local tossResult
+	tossResult=$((RANDOM%2))
+	if [ $tossResult -eq 0 ]
+	then
+		echo "user"
+	else
+		echo "computer"
+	fi
+}
+
 function the_main_exec_starts_here(){
+	local whoseChanceIsIt=0
 	reset_the_board
+	whoseChanceIsIt=$( toss_to_decide_who_plays_first )
 }
 
 the_main_exec_starts_here
