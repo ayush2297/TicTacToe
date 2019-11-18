@@ -47,7 +47,7 @@ function user_chance(){
 		user_chance
 		return
 	fi
-	if [[ ${ticTacToeBoard[$chosenCell]} =~ [0-9] ]]
+	if [[ ${ticTacToeBoard[$chosenCell]} =~ [0-9] ]] && [[ ${ticTacToeBoard[$chosenCell]} =~ [O] ]]
 	then
 		ticTacToeBoard[$chosenCell]=$PLAYER_SYMBOL
 	else
@@ -57,7 +57,14 @@ function user_chance(){
 }
 
 function computer_chance(){
-	
+	local chosenCell=$(($((RANDOM%9))+1))
+	if [[ ${ticTacToeBoard[$chosenCell]} =~ [0-9] ]] && [[ ${ticTacToeBoard[$chosenCell]} =~ [X] ]]
+	then
+		ticTacToeBoard[$chosenCell]=$COMPUTER_SYMBOL
+	else
+		echo "cell already occupied.... try another cell"
+		computer_chance
+	fi
 }
 
 function check_diagonals_for_win(){
@@ -166,13 +173,14 @@ function the_main_exec_starts_here(){
 	chanceNumber=1
 	while [ $chanceNumber -le $MAX_CELLS_AVAILABLE ]
 	do
+		display_the_board
 		if [ $whoseChanceIsIt == "user" ]
 		then
-			display_the_board
 			user_chance
 			weHaveAWinner=$( check_if_this_player_won $whoseChanceIsIt )
 		else
 			computer_chance
+			weHaveAWinner=$( check_if_this_player_won $whoseChanceIsIt )
 		fi
 		if [ $weHaveAWinner -gt 0 ]
 		then
