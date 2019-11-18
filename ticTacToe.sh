@@ -95,10 +95,10 @@ function check_diagonals_for_win(){
 }
 
 function check_rows_for_win(){
-	for (( row=0 ; $row< $rowColCount ; row++ ))
+	for (( row=1 ; $row<= $rowColCount ; row++ ))
 	do
 		local win=0
-		for (( i=$((1+$row*3)) ; $i<$(($rowColCount*$(($row+1)))) ; i++ ))
+		for (( i=$(($row*3)) ; $i<$(($rowColCount*$(($row)))) ; i++ ))
 		do
 			if [ ${ticTacToeBoard[$i]} == ${ticTacToeBoard[$i+1]} ]
 			then
@@ -107,7 +107,29 @@ function check_rows_for_win(){
 				break
 			fi
 		done
-		if [[ $win -eq $(($rowColCount-1)) ]] && [[ ${ticTacToeBoard[$((1+$row*3))]} == $1 ]]
+		if [[ $win -eq $(($rowColCount-1)) ]] && [[ ${ticTacToeBoard[$(($row*3))]} == $1 ]]
+		then
+			echo 1
+			return
+		fi
+	done
+	echo 0
+}
+
+function check_cols_for_win(){
+	for (( col=1 ; $col <= $rowColCount ; col++ ))
+	do
+		local win=0
+		for (( i=$col ; $i <= $(($rowColCount*$(($rowColCount-1)) )) ; i=$(($i+$rowColCount)) ))
+		do
+			if [ ${ticTacToeBoard[$i]} == ${ticTacToeBoard[$(($i+$rowColCount))]} ]
+			then
+				win=$(($win+1))
+			else
+				break
+			fi
+		done
+		if [[ $win -eq $(($rowColCount-1)) ]] && [[ ${ticTacToeBoard[$col]} == $1 ]] 
 		then
 			echo 1
 			return
@@ -128,7 +150,7 @@ function check_if_this_player_won(){
 	fi
 	winCounter=$(($winCounter+ $( check_diagonals_for_win $thisPlayerSymbol ) ))
 	winCounter=$(($winCounter+ $( check_rows_for_win $thisPlayerSymbol ) ))
-	#winCounter=$(($winCounter+ $( check_cols_for_win $thisPlayerSymbol ) ))
+	winCounter=$(($winCounter+ $( check_cols_for_win $thisPlayerSymbol ) ))
 	echo $winCounter
 }
 
