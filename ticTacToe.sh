@@ -73,6 +73,7 @@ function check_diagonals_for_win(){
 		echo 1
 		return
 	fi
+
 	#checking for reverse diagonal
 	local revDiagWinning=1
 	for (( i=$rowColCount ; $i<$MAX_CELLS_AVAILABLE ; i=$(($i+$rowColCount-1)) ))
@@ -93,6 +94,28 @@ function check_diagonals_for_win(){
 	echo 0
 }
 
+function check_rows_for_win(){
+	for (( row=0 ; $row< $rowColCount ; row++ ))
+	do
+		local win=0
+		for (( i=$((1+$row*3)) ; $i<$(($rowColCount*$(($row+1)))) ; i++ ))
+		do
+			if [ ${ticTacToeBoard[$i]} == ${ticTacToeBoard[$i+1]} ]
+			then
+				win=$(($win+1))
+			else
+				break
+			fi
+		done
+		if [[ $win -eq $(($rowColCount-1)) ]] && [[ ${ticTacToeBoard[$((1+$row*3))]} == $1 ]]
+		then
+			echo 1
+			return
+		fi
+	done
+	echo 0
+}
+
 function check_if_this_player_won(){
 	local thisPlayer=$1
 	local winCounter=0
@@ -104,6 +127,8 @@ function check_if_this_player_won(){
 		thisPlayerSymbol=$COMPUTER_SYMBOL
 	fi
 	winCounter=$(($winCounter+ $( check_diagonals_for_win $thisPlayerSymbol ) ))
+	winCounter=$(($winCounter+ $( check_rows_for_win $thisPlayerSymbol ) ))
+	#winCounter=$(($winCounter+ $( check_cols_for_win $thisPlayerSymbol ) ))
 	echo $winCounter
 }
 
@@ -117,7 +142,7 @@ function the_main_exec_starts_here(){
 	do
 		if [ $whoseChanceIsIt == "user" ]
 		then
-			#display_the_board
+			display_the_board
 			user_chance
 			weHaveAWinner=$( check_if_this_player_won $whoseChanceIsIt )
 		else
