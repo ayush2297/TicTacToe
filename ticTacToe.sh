@@ -11,6 +11,7 @@ declare -a ticTacToeBoard
 
 #variables
 declare rowColCount=$(echo "sqrt($MAX_CELLS_AVAILABLE)" | bc)
+declare compAlmostWinningString=""
 
 #resets the board cells with initial values
 function reset_the_board(){
@@ -54,6 +55,49 @@ function user_chance(){
 		echo "cell already occupied.... try another cell"
 		user_chance
 	fi
+}
+
+function form_computer_winning_possibility_string(){
+	local formedString=""
+	for(( i=1 ; $i <= $rowColCount ; i++ ))
+	do
+		formedString=$formedString" "$COMPUTER_SYMBOL
+	done
+	echo $formedString
+}
+
+function check_diag_winning_possibility(){
+	local mainDiagCells=""
+	for (( i=1 ; $i<=$MAX_CELLS_AVAILABLE ; i=$(($i+$rowColCount+1)) ))
+	do
+		mainDiagCells=$mainDiagCells" "${ticTacToeBoard[$i]}
+	done
+	local mainDiagSorted=$(echo $mainDiagCells | grep -o "$compAlmostWinningString" )
+	if [ $mainDiagSorted == "$compAlmostWinningString" ]
+	then
+		echo "grep working"
+		return
+	fi
+
+	local revDiagCells=""
+	for (( i=1 ; $i<=$MAX_CELLS_AVAILABLE ; i=$(($i+$rowColCount+1)) ))
+	do
+		revDiagCells=${ticTacToeBoard[$i]}" "$revDiagCells
+	done
+	local revDiagSorted=$(echo $revDiagCells | grep -o "$compAlmostWinningString" ) || revDiagSorted="null"
+	if [ "$revDiagSorted" == "$compAlmostWinningString" ]
+	then
+		echo "grep working"
+		return
+	else
+		echo "no string yet"
+	fi
+}
+
+function check_computer_can_play_winning_chance(){
+	check_diag_winning_possibility
+	#check_row_winning_possibility
+	#check_col_winning_possibility
 }
 
 function computer_chance(){
