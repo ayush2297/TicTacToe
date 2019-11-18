@@ -56,6 +56,10 @@ function user_chance(){
 	fi
 }
 
+function computer_chance(){
+	
+}
+
 function check_diagonals_for_win(){
 	local mainDiagWinning=1
 	#checking main diagonal
@@ -168,7 +172,7 @@ function the_main_exec_starts_here(){
 			user_chance
 			weHaveAWinner=$( check_if_this_player_won $whoseChanceIsIt )
 		else
-			echo "comp plays"
+			computer_chance
 		fi
 		if [ $weHaveAWinner -gt 0 ]
 		then
