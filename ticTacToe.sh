@@ -172,9 +172,10 @@ function the_main_exec_starts_here(){
 		fi
 		if [ $weHaveAWinner -gt 0 ]
 		then
-			break
+			exit
 		fi
 	done
+	echo "Its a tie"
 }
 
 the_main_exec_starts_here
