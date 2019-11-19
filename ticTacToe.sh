@@ -1,4 +1,4 @@
-#! /bin/bash 
+#! /bin/bash -x
 
 echo "tic-tac-toe game*************"
 #constants
@@ -11,8 +11,9 @@ declare CENTER_CELL=5
 
 #arrays and dictionaries
 declare -a ticTacToeBoard
-declare -a corners=(1 3 7 9)
-declare -a sides=(4,6,2,8)
+declare -a cornerCells=(1 3 7 9)
+declare -a sideCells(4,6,2,8)
+
 #resets the board cells with initial values
 function reset_the_board(){
 	for (( i=1 ; i<=MAX_CELLS_AVAILABLE ; i++ ))
@@ -182,7 +183,7 @@ function win_checker(){
 function search_for_corner_cell_space(){
 	for (( i=0 ; $i < 4 ; i++ ))
 	do
-		index=${corners[$i]}
+		index=${cornerCells[$i]}
 		if [[ ${ticTacToeBoard[$index]} != $PLAYER_SYMBOL ]] && [[ ${ticTacToeBoard[$index]} != $COMPUTER_SYMBOL ]]
 		then
 			echo $index
@@ -221,7 +222,7 @@ function computer_chance(){
 	fi
 	for (( i=0 ; $i<4 ; i++ ))
 	do
-		local index=${sides[$i]}
+		local index=${sideCells[$i]}
 		if [[ ${ticTacToeBoard[$index]} != $PLAYER_SYMBOL && ${ticTacToeBoard[$index]} != $COMPUTER_SYMBOL ]]
 		then
 			ticTacToeBoard[$winCell]=$COMPUTER_SYMBOL
