@@ -11,8 +11,8 @@ declare CENTER_CELL=5
 
 #arrays and dictionaries
 declare -a ticTacToeBoard
-declare -a cornerCells=(1 3 7 9)
-declare -a sideCells=(4,6,2,8)
+declare -a cornerCells=([1]=1 [2]=3 [3]=7 [4]=9)
+declare -a sideCells=([1]=2 [2]=4 [3]=6 [4]=8)
 
 #resets the board cells with initial values
 function reset_the_board(){
@@ -184,7 +184,7 @@ function win_checker(){
 
 #checks if corner cells are available. if yes then returns a corner cell
 function search_for_corner_cell_space(){
-	for (( i=0 ; $i < 4 ; i++ ))
+	for (( i=1 ; $i <= 4 ; i++ ))
 	do
 		index=${cornerCells[$i]}
 		if [[ ${ticTacToeBoard[$index]} != $PLAYER_SYMBOL ]] && [[ ${ticTacToeBoard[$index]} != $COMPUTER_SYMBOL ]]
@@ -193,6 +193,7 @@ function search_for_corner_cell_space(){
 			return
 		fi
 	done
+	echo 0
 }
 
 #computer choses to play winning move first followed by a blocking move to 
@@ -224,14 +225,16 @@ function computer_chance(){
 		return
 	elif [[ ${ticTacToeBoard[$CENTER_CELL]} != $PLAYER_SYMBOL && ${ticTacToeBoard[$CENTER_CELL]} != $COMPUTER_SYMBOL ]]
 	then
-		${ticTacToeBoard[$CENTER_CELL]}=$COMPUTER_SYMBOL
+		echo $CENTER_CELL
+		return
 	fi
-	for (( i=0 ; $i<4 ; i++ ))
+	for (( i=1 ; $i<=4 ; i++ ))
 	do
 		local index=${sideCells[$i]}
 		if [[ ${ticTacToeBoard[$index]} != $PLAYER_SYMBOL && ${ticTacToeBoard[$index]} != $COMPUTER_SYMBOL ]]
 		then
-			ticTacToeBoard[$index]=$COMPUTER_SYMBOL
+			echo $index
+			return
 		fi
 	done
 }
