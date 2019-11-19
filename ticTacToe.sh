@@ -163,8 +163,8 @@ function win_checker(){
 	local chosenCellForWinCheck=1
 	while [ $chosenCellForWinCheck -le $MAX_CELLS_AVAILABLE ]
 	do
-			if [[ ${ticTacToeBoard[$chosenCellForWinCheck]} =~ [1-9] ]]
-			then
+		if [[ ${ticTacToeBoard[$chosenCellForWinCheck]} =~ [1-9] ]]
+		then
 			winCell=$(check_win_possibility $chosenCellForWinCheck $1)
 		fi
 		if [ $winCell -gt 0 ]
