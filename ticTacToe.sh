@@ -5,13 +5,11 @@ echo "tic-tac-toe game*************"
 declare MAX_CELLS_AVAILABLE=9
 declare PLAYER_SYMBOL="X"
 declare COMPUTER_SYMBOL="O"
+declare PLAYER_WINS="XXX"
+declare COMPUTER_WINS="OOO"
 
 #arrays and dictionaries
 declare -a ticTacToeBoard
-
-#variables
-declare rowColCount=$(echo "sqrt($MAX_CELLS_AVAILABLE)" | bc)
-declare compAlmostWinningString=""
 
 #resets the board cells with initial values
 function reset_the_board(){
@@ -21,6 +19,7 @@ function reset_the_board(){
 	done
 }
 
+#flip a coin to decide who plays first
 function toss_to_decide_who_plays_first(){
 	local tossResult
 	tossResult=$((RANDOM%2))
@@ -32,6 +31,7 @@ function toss_to_decide_who_plays_first(){
 	fi
 }
 
+#show board in proper format
 function display_the_board(){
 	echo "-------------"
 	for (( row=1 ; $row <= $MAX_CELLS_AVAILABLE ; row=$(($row+3)) ))
@@ -41,195 +41,192 @@ function display_the_board(){
 	done
 }
 
-function user_chance(){
-	read -p "enter the position you want to play at: " chosenCell
-	if [[ $chosenCell -lt 1 ]] || [[ $chosenCell  -gt 9 ]]
-	then
-		user_chance
-		return
-	fi
-	if [[ ${ticTacToeBoard[$chosenCell]} =~ [0-9] ]] && [[ ${ticTacToeBoard[$chosenCell]} =~ [O] ]]
-	then
-		ticTacToeBoard[$chosenCell]=$PLAYER_SYMBOL
-	else
-		echo "cell already occupied.... try another cell"
-		user_chance
-	fi
+#check if the elements passed give us a winner
+function check_for_same_elements(){
+	elementsAsString=${ticTacToeBoard[$1]}${ticTacToeBoard[$2]}${ticTacToeBoard[$3]}
+	case $elementsAsString in
+		$PLAYER_WINS)
+			echo 1;;
+		$COMPUTER_WINS)
+			echo 2;;
+		*)
+			echo 0;;
+	esac
 }
 
-function form_computer_winning_possibility_string(){
-	local formedString=""
-	for(( i=1 ; $i <= $rowColCount ; i++ ))
-	do
-		formedString=$formedString" "$COMPUTER_SYMBOL
-	done
-	echo $formedString
+#checks diagonals for a winner
+function check_for_diagonal_win(){
+	local returnCell=0
+	local caseVariable=$1
+	case $caseVariable in
+		1|9)
+			returnCell=$(check_for_same_elements 1 5 9);;
+		3|7)
+			returnCell=$(check_for_same_elements 3 5 7);;
+		5)
+			returnCell=$(($returnCell+$(check_for_same_elements 1 5 9) ))
+			returnCell=$(($returnCell+$(check_for_same_elements 3 5 7) ));;
+	esac
+	echo $returnCell
 }
 
-function check_diag_winning_possibility(){
-	local mainDiagCells=""
-	for (( i=1 ; $i<=$MAX_CELLS_AVAILABLE ; i=$(($i+$rowColCount+1)) ))
-	do
-		mainDiagCells=$mainDiagCells" "${ticTacToeBoard[$i]}
-	done
-	local mainDiagSorted=$(echo $mainDiagCells | grep -o "$compAlmostWinningString" )
-	if [ $mainDiagSorted == "$compAlmostWinningString" ]
-	then
-		echo "grep working"
-		return
-	fi
-
-	local revDiagCells=""
-	for (( i=1 ; $i<=$MAX_CELLS_AVAILABLE ; i=$(($i+$rowColCount+1)) ))
-	do
-		revDiagCells=${ticTacToeBoard[$i]}" "$revDiagCells
-	done
-	local revDiagSorted=$(echo $revDiagCells | grep -o "$compAlmostWinningString" ) || revDiagSorted="null"
-	if [ "$revDiagSorted" == "$compAlmostWinningString" ]
-	then
-		echo "grep working"
-		return
-	else
-		echo "no string yet"
-	fi
+#checks rows for a winner
+function check_for_row_win(){
+	local returnCell=0
+	local caseVariable=$1
+	case $caseVariable in
+		1|2|3)
+			returnCell=$(check_for_same_elements 1 2 3);;
+		4|5|6)
+			returnCell=$(check_for_same_elements 4 5 6);;
+		7|8|9)
+			returnCell=$(check_for_same_elements 7 8 9);;
+	esac
+	echo $returnCell
 }
 
-function check_computer_can_play_winning_chance(){
-	check_diag_winning_possibility
-	#check_row_winning_possibility
-	#check_col_winning_possibility
+#checks columns for a winner
+function check_for_column_win(){
+	local returnCell=0
+	local caseVariable=$1
+	case $caseVariable in
+		1|4|7)
+			returnCell=$(check_for_same_elements 1 4 7);;
+		2|5|8)
+			returnCell=$(check_for_same_elements 2 5 8);;
+		3|6|9)
+			returnCell=$(check_for_same_elements 3 6 9);;
+	esac
+	echo $returnCell
 }
 
-function computer_chance(){
-	local chosenCell=$(($((RANDOM%9))+1))
-	if [[ ${ticTacToeBoard[$chosenCell]} =~ [0-9] ]] && [[ ${ticTacToeBoard[$chosenCell]} =~ [X] ]]
-	then
-		ticTacToeBoard[$chosenCell]=$COMPUTER_SYMBOL
-	else
-		echo "cell already occupied.... try another cell"
-		computer_chance
-	fi
-}
-
-function check_diagonals_for_win(){
-	local mainDiagWinning=1
-	#checking main diagonal
-	for (( i=1 ; $i<$MAX_CELLS_AVAILABLE ; i=$(($i+$rowColCount+1)) ))
-	do
-		if [ ${ticTacToeBoard[$i]} == ${ticTacToeBoard[$(($i+$rowColCount+1))]} ]
-		then
-			mainDiagWinning=$(($mainDiagWinning+1))
-		else
-			break
-		fi
-	done
-	if [[ $mainDiagWinning -eq $rowColCount ]] && [[ ${ticTacToeBoard[1]} == $1 ]]
-	then
-		echo 1
-		return
-	fi
-
-	#checking for reverse diagonal
-	local revDiagWinning=1
-	for (( i=$rowColCount ; $i<$MAX_CELLS_AVAILABLE ; i=$(($i+$rowColCount-1)) ))
-	do
-		if [ ${ticTacToeBoard[$i]} == ${ticTacToeBoard[$(($i+$rowColCount-1))]} ]
-		then
-			revDiagWinning=$(($revDiagWinning+1))
-		else
-			break
-		fi
-	done
-	if [[ $revDiagWinning -eq $rowColCount ]] && [[ ${ticTacToeBoard[$rowColCount]} == $1 ]]
-	then
-		echo 1
-		return
-	fi
-	#if no winning condition then ....
-	echo 0
-}
-
-function check_rows_for_win(){
-	for (( row=1 ; $row<= $rowColCount ; row++ ))
-	do
-		local win=0
-		for (( i=$(($row*3)) ; $i<$(($rowColCount*$(($row)))) ; i++ ))
-		do
-			if [ ${ticTacToeBoard[$i]} == ${ticTacToeBoard[$i+1]} ]
-			then
-				win=$(($win+1))
-			else
-				break
-			fi
-		done
-		if [[ $win -eq $(($rowColCount-1)) ]] && [[ ${ticTacToeBoard[$(($row*3))]} == $1 ]]
-		then
-			echo 1
-			return
-		fi
-	done
-	echo 0
-}
-
-function check_cols_for_win(){
-	for (( col=1 ; $col <= $rowColCount ; col++ ))
-	do
-		local win=0
-		for (( i=$col ; $i <= $(($rowColCount*$(($rowColCount-1)) )) ; i=$(($i+$rowColCount)) ))
-		do
-			if [ ${ticTacToeBoard[$i]} == ${ticTacToeBoard[$(($i+$rowColCount))]} ]
-			then
-				win=$(($win+1))
-			else
-				break
-			fi
-		done
-		if [[ $win -eq $(($rowColCount-1)) ]] && [[ ${ticTacToeBoard[$col]} == $1 ]] 
-		then
-			echo 1
-			return
-		fi
-	done
-	echo 0
-}
-
+#perform various checks to see if we have a winner
 function check_if_this_player_won(){
-	local thisPlayer=$1
-	local winCounter=0
-	local thisPlayerSymbol=0
-	if [ $thisPlayer == "user" ]
+	local winCheck=0
+	local cell="$1"
+	if [ $(($cell%2)) -eq 1  ]
 	then
-		thisPlayerSymbol=$PLAYER_SYMBOL
-	else
-		thisPlayerSymbol=$COMPUTER_SYMBOL
+		winCheck=$(($winCheck+$(check_for_diagonal_win $cell) ))
 	fi
-	winCounter=$(($winCounter+ $( check_diagonals_for_win $thisPlayerSymbol ) ))
-	winCounter=$(($winCounter+ $( check_rows_for_win $thisPlayerSymbol ) ))
-	winCounter=$(($winCounter+ $( check_cols_for_win $thisPlayerSymbol ) ))
-	echo $winCounter
+	winCheck=$(($winCheck+$(check_for_row_win $cell) ))
+	winCheck=$(($winCheck+$(check_for_column_win	$cell) ))
+	echo $winCheck
 }
 
+#finding a cell, which when played will make the computer
+#win the game
+function check_win_possibility(){
+	local tempWinCheck=0
+	local tempValue=${ticTacToeBoard[$1]}
+	local cellToCheck=$1
+	ticTacToeBoard[$cellToCheck]=$2
+	tempWinCheck=$(check_if_this_player_won $cellToCheck)
+	if [ $tempWinCheck -gt 0 ]
+	then
+		echo $tempWinCheck
+		return
+	fi
+	ticTacToeBoard[$cellToCheck]=$tempValue
+	echo 0
+}
+
+function insert_in_the_cell(){
+	local cellToInsert=$1
+	local symbolToInsert=0
+	if [ $2 == "user" ]
+	then
+		symbolToInsert=$PLAYER_SYMBOL
+	else
+		symbolToInsert=$COMPUTER_SYMBOL
+	fi
+	if [[ ${ticTacToeBoard[$cellToInsert]} =~ [0-9] ]]
+	then
+		ticTacToeBoard[$cellToInsert]=$symbolToInsert
+	fi
+}
+
+#user selects a cell to play its turn
+function user_chance(){
+	local chosenCell=0
+	while [ true ]
+	do
+		read -p "enter the position you want to play at: " chosenCell
+		if [[ $chosenCell -ge 1 ]] && [[ $chosenCell  -le 9 ]] && [[ ${ticTacToeBoard[$chosenCell]} != $COMPUTER_SYMBOL ]]
+		then
+			break
+		fi
+	done
+	echo $chosenCell
+}
+
+#computer plays at random cell
+function computer_chance(){
+	local chosenCellComp=1
+	local winCell=0
+	if [ $1 -gt 4 ]
+	then
+		while [ $chosenCellComp -le $MAX_CELLS_AVAILABLE ]
+		do
+			if [[ ${ticTacToeBoard[$chosenCellComp]} =~ [1-9] ]]
+			then
+				winCell=$(check_win_possibility $chosenCellComp $COMPUTER_SYMBOL)
+			fi
+			if [ $winCell -gt 0 ]
+			then
+				echo $chosenCellComp
+				return
+			fi
+			((chosenCellComp++))
+		done
+	fi
+	while [ true ]
+	do
+		winCell=$(($((RANDOM%9))+1))
+		if [[ ${ticTacToeBoard[$winCell]} =~ [0-9] ]]
+		then
+			echo $winCell
+			break
+		fi
+	done
+}
+
+function switch_player(){
+	if [ $1 == "user" ]
+	then
+		echo "computer"
+	else
+		echo "user"
+	fi
+}
+
+#game starts here
 function the_main_exec_starts_here(){
-	local whoseChanceIsIt=0
-	local weHaveAWinner=0
+	local checkVal=0
 	reset_the_board
 	local whoseChanceIsIt=$( toss_to_decide_who_plays_first )
 	chanceNumber=1
 	while [ $chanceNumber -le $MAX_CELLS_AVAILABLE ]
 	do
+		local cell=0
 		display_the_board
 		if [ $whoseChanceIsIt == "user" ]
 		then
-			user_chance
-			weHaveAWinner=$( check_if_this_player_won $whoseChanceIsIt )
+			cell=$(user_chance)
+			insert_in_the_cell $cell $whoseChanceIsIt
+			display_the_board
+			checkVal=$(check_if_this_player_won $cell)
 		else
-			computer_chance
-			weHaveAWinner=$( check_if_this_player_won $whoseChanceIsIt )
+			cell=$(computer_chance $chanceNumber)
+			insert_in_the_cell $cell $whoseChanceIsIt
+			checkVal=$(check_if_this_player_won $cell)
 		fi
-		if [ $weHaveAWinner -gt 0 ]
+		if [ $checkVal -gt 0 ]
 		then
+			local whoWon=$whoseChanceIsIt
 			exit
 		fi
+		whoseChanceIsIt=$(switch_player $whoseChanceIsIt)
+		((chanceNumber++))
 	done
 	echo "Its a tie"
 }
