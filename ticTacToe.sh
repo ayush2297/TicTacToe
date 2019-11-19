@@ -246,7 +246,7 @@ function switch_player(){
 	fi
 }
 
-#game starts here
+#tic-tac-toe game starts here
 function the_main_exec_starts_here(){
 	local isWinner=0
 	local whoseChanceIsIt=0
@@ -279,4 +279,5 @@ function the_main_exec_starts_here(){
 	echo "Its a tie"
 }
 
+#main call
 the_main_exec_starts_here
