@@ -7,6 +7,7 @@ declare PLAYER_SYMBOL="X"
 declare COMPUTER_SYMBOL="O"
 declare PLAYER_WINS="XXX"
 declare COMPUTER_WINS="OOO"
+declare CENTER_CELL=5
 
 #arrays and dictionaries
 declare -a ticTacToeBoard
@@ -214,6 +215,9 @@ function computer_chance(){
 	then
 		echo $playCornerCell
 		return
+	elif [[ ${ticTacToeBoard[$winCell]} != $PLAYER_SYMBOL && ${ticTacToeBoard[$winCell]} != $COMPUTER_SYMBOL ]]
+	then
+		${ticTacToeBoard[$winCell]}=$COMPUTER_SYMBOL
 	fi
 	while [ true ]
 	do
