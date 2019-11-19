@@ -9,9 +9,6 @@ declare COMPUTER_SYMBOL="O"
 #arrays and dictionaries
 declare -a ticTacToeBoard
 
-#variables
-declare rowColCount=$(echo "sqrt($MAX_CELLS_AVAILABLE)" | bc)
-
 #resets the board cells with initial values
 function reset_the_board(){
 	for (( i=1 ; i<=MAX_CELLS_AVAILABLE ; i++ ))
