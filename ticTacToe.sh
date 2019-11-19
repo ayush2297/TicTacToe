@@ -52,7 +52,7 @@ function check_for_same_elements(){
 			echo "computer wins"
 			exit ;;
 		*)
-			echo "no winner yet..";;
+			;;
 	esac
 }
 
