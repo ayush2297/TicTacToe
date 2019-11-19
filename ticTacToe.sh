@@ -41,23 +41,6 @@ function display_the_board(){
 	done
 }
 
-#user selects a cell to play its turn
-function user_chance(){
-	read -p "enter the position you want to play at: " chosenCell
-	if [[ $chosenCell -lt 1 ]] || [[ $chosenCell  -gt 9 ]]
-	then
-		user_chance
-		return
-	fi
-	if [[ ${ticTacToeBoard[$chosenCell]} =~ [0-9] ]] && [[ ${ticTacToeBoard[$chosenCell]} =~ [O] ]]
-	then
-		ticTacToeBoard[$chosenCell]=$PLAYER_SYMBOL
-	else
-		echo "cell already occupied.... try another cell"
-		user_chance
-	fi
-}
-
 #check if the elements passed give us a winner
 function check_for_same_elements(){
 	elementsAsString=${ticTacToeBoard[$1]}${ticTacToeBoard[$2]}${ticTacToeBoard[$3]}
@@ -87,7 +70,7 @@ function check_for_row_win(){
 }
 
 #checks columns for a winner
-function check_for_colum_win(){
+function check_for_column_win(){
 	check_for_same_elements 1 4 7
 	check_for_same_elements 2 5 8
 	check_for_same_elements 3 6 9
@@ -98,6 +81,36 @@ function check_if_this_player_won(){
 	check_for_diagonal_win
 	check_for_row_win
 	check_for_column_win
+}
+
+#user selects a cell to play its turn
+function user_chance(){
+	local chosenCell=0
+	read -p "enter the position you want to play at: " chosenCell
+	if [[ $chosenCell -lt 1 ]] || [[ $chosenCell  -gt 9 ]]
+	then
+		user_chance
+		return
+	fi
+	if [[ ${ticTacToeBoard[$chosenCell]} =~ [0-9] ]] && [[ ${ticTacToeBoard[$chosenCell]} != $COMPUTER_SYMBOL ]]
+	then
+		ticTacToeBoard[$chosenCell]=$PLAYER_SYMBOL
+	else
+		echo "cell already occupied.... try another cell"
+		user_chance
+	fi
+}
+
+#computer plays at random cell
+function computer_chance(){
+	local chosenCell=$(( $((RANDOM%9))+1 ))
+	if [[ ${ticTacToeBoard[$chosenCell]} =~ [0-9] ]] && [[ ${ticTacToeBoard[$chosenCell]} != $PLAYER_SYMBOL ]]
+	then
+		ticTacToeBoard[$chosenCell]=$COMPUTER_SYMBOL
+	else
+		echo "cell already occupied.... try another cell"
+		computer_chance
+	fi
 }
 
 #game starts here
@@ -113,9 +126,11 @@ function the_main_exec_starts_here(){
 		then
 			user_chance
 			check_if_this_player_won
+			whoseChanceIsIt="computer"
 		else
 			computer_chance
-			weHaveAWinner=$( check_if_this_player_won $whoseChanceIsIt )
+			check_if_this_player_won
+			whoseChanceIsIt="user"
 		fi
 	done
 	echo "Its a tie"
