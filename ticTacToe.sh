@@ -12,7 +12,7 @@ declare CENTER_CELL=5
 #arrays and dictionaries
 declare -a ticTacToeBoard
 declare -a cornerCells=(1 3 7 9)
-declare -a sideCells(4,6,2,8)
+declare -a sideCells=(4,6,2,8)
 
 #resets the board cells with initial values
 function reset_the_board(){
@@ -164,6 +164,7 @@ function user_chance(){
 
 function win_checker(){
 	local chosenCellForWinCheck=1
+	local winCell=0
 	while [ $chosenCellForWinCheck -le $MAX_CELLS_AVAILABLE ]
 	do
 		if [[ ${ticTacToeBoard[$chosenCellForWinCheck]} =~ [1-9] ]]
@@ -195,7 +196,6 @@ function search_for_corner_cell_space(){
 #computer plays at random cell
 function computer_chance(){
 	local chosenCellComp=1
-	local winCell=0
 	if [ $1 -ge 4 ]
 	then
 		ifCompCanWin=$(win_checker $COMPUTER_SYMBOL)
