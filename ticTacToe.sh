@@ -202,6 +202,7 @@ function switch_player(){
 #game starts here
 function the_main_exec_starts_here(){
 	local checkVal=0
+	local whoseChanceIsIt=0
 	reset_the_board
 	local whoseChanceIsIt=$( toss_to_decide_who_plays_first )
 	chanceNumber=1
@@ -213,7 +214,6 @@ function the_main_exec_starts_here(){
 		then
 			cell=$(user_chance)
 			insert_in_the_cell $cell $whoseChanceIsIt
-			display_the_board
 			checkVal=$(check_if_this_player_won $cell)
 		else
 			cell=$(computer_chance $chanceNumber)
@@ -222,6 +222,7 @@ function the_main_exec_starts_here(){
 		fi
 		if [ $checkVal -gt 0 ]
 		then
+			display_the_board
 			local whoWon=$whoseChanceIsIt
 			exit
 		fi
