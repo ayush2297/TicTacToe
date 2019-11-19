@@ -10,7 +10,7 @@ declare COMPUTER_WINS="OOO"
 
 #arrays and dictionaries
 declare -a ticTacToeBoard
-
+declare -a corners=(1 3 7 9)
 #resets the board cells with initial values
 function reset_the_board(){
 	for (( i=1 ; i<=MAX_CELLS_AVAILABLE ; i++ ))
@@ -177,6 +177,18 @@ function win_checker(){
 	echo 0
 }
 
+function search_for_corner_cell_space(){
+	for (( i=0 ; $i < 4 ; i++ ))
+	do
+		index=${corners[$i]}
+		if [[ ${ticTacToeBoard[$index]} != $PLAYER_SYMBOL ]] && [[ ${ticTacToeBoard[$index]} != $COMPUTER_SYMBOL ]]
+		then
+			echo $index
+			return
+		fi
+	done
+}
+
 #computer plays at random cell
 function computer_chance(){
 	local chosenCellComp=1
@@ -195,6 +207,12 @@ function computer_chance(){
 			echo $ifPlayerCanWin
 			return
 		fi
+	fi
+	playCornerCell=$(search_for_corner_cell_space )
+	if [ $playCornerCell -ne 0 ]
+	then
+		echo $playCornerCell
+		return
 	fi
 	while [ true ]
 	do
