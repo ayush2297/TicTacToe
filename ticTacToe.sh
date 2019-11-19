@@ -12,6 +12,7 @@ declare CENTER_CELL=5
 #arrays and dictionaries
 declare -a ticTacToeBoard
 declare -a corners=(1 3 7 9)
+declare -a sides=(4,6,2,8)
 #resets the board cells with initial values
 function reset_the_board(){
 	for (( i=1 ; i<=MAX_CELLS_AVAILABLE ; i++ ))
@@ -215,18 +216,14 @@ function computer_chance(){
 	then
 		echo $playCornerCell
 		return
-	elif [[ ${ticTacToeBoard[$winCell]} != $PLAYER_SYMBOL && ${ticTacToeBoard[$winCell]} != $COMPUTER_SYMBOL ]]
+	elif [[ ${ticTacToeBoard[$CENTER_CELL]} != $PLAYER_SYMBOL && ${ticTacToeBoard[$CENTER_CELL]} != $COMPUTER_SYMBOL ]]
 	then
-		${ticTacToeBoard[$winCell]}=$COMPUTER_SYMBOL
+		${ticTacToeBoard[$CENTER_CELL]}=$COMPUTER_SYMBOL
 	fi
-	while [ true ]
+	for (( i=0 ; $i<4 ; i++ ))
 	do
-		winCell=$(($((RANDOM%9))+1))
-		if [[ ${ticTacToeBoard[$winCell]} =~ [0-9] ]]
-		then
-			echo $winCell
-			break
-		fi
+		local index=${sides[$i]}
+		if [[ ${ticTacToeBoard[$index]} != $PLAYER_SYMBOL && ${ticTacToeBoard[$index]} != $COMPUTER_SYMBOL ]]
 	done
 }
 
