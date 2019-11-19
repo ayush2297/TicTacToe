@@ -44,7 +44,7 @@ function display_the_board(){
 	done
 }
 
-#check if the elements passed give us a winner
+#check if the cells passed give us a winner
 function check_for_same_elements(){
 	elementsAsString=${ticTacToeBoard[$1]}${ticTacToeBoard[$2]}${ticTacToeBoard[$3]}
 	case $elementsAsString in
@@ -116,8 +116,7 @@ function check_if_this_player_won(){
 	echo $winCheck
 }
 
-#finding a cell, which when played will make the computer
-#win the game
+#finding a cell, which when played will make the player passed win the game
 function check_win_possibility(){
 	local tempWinCheck=0
 	local tempValue=${ticTacToeBoard[$1]}
@@ -133,8 +132,9 @@ function check_win_possibility(){
 	echo 0
 }
 
+#to insert the specified symbol into the specified cell
 function insert_in_the_cell(){
-	local cellToInsert=$1
+	local cellToInsertTheSymbol=$1
 	local symbolToInsert=0
 	if [ $2 == "user" ]
 	then
@@ -142,9 +142,9 @@ function insert_in_the_cell(){
 	else
 		symbolToInsert=$COMPUTER_SYMBOL
 	fi
-	if [[ ${ticTacToeBoard[$cellToInsert]} =~ [0-9] ]]
+	if [[ ${ticTacToeBoard[$cellToInsertTheSymbol]} =~ [0-9] ]]
 	then
-		ticTacToeBoard[$cellToInsert]=$symbolToInsert
+		ticTacToeBoard[$cellToInsertTheSymbol]=$symbolToInsert
 	fi
 }
 
@@ -162,8 +162,10 @@ function user_chance(){
 	echo $chosenCell
 }
 
+#to check if the given symbol->($1) player can win the game in the next chance
 function win_checker(){
 	local chosenCellForWinCheck=1
+	local winCell=0
 	while [ $chosenCellForWinCheck -le $MAX_CELLS_AVAILABLE ]
 	do
 		if [[ ${ticTacToeBoard[$chosenCellForWinCheck]} =~ [1-9] ]]
@@ -180,6 +182,7 @@ function win_checker(){
 	echo 0
 }
 
+#checks if corner cells are available. if yes then returns a corner cell
 function search_for_corner_cell_space(){
 	for (( i=0 ; $i < 4 ; i++ ))
 	do
@@ -192,9 +195,13 @@ function search_for_corner_cell_space(){
 	done
 }
 
-#computer plays at random cell
+#computer choses to play winning move first followed by a blocking move to 
+#block the player from winning followed by playing on a corner cell
+#followed by playing on the center cell else any other remaining cell
 function computer_chance(){
-	local chosenCellComp=1
+	local ifCompCanWin=0
+	local ifPlayerCanWin=0
+	local playCornerCell=0
 	if [ $1 -ge 4 ]
 	then
 		ifCompCanWin=$(win_checker $COMPUTER_SYMBOL)
@@ -229,6 +236,7 @@ function computer_chance(){
 	done
 }
 
+#to give next chance to other player
 function switch_player(){
 	if [ $1 == "user" ]
 	then
@@ -240,26 +248,26 @@ function switch_player(){
 
 #game starts here
 function the_main_exec_starts_here(){
-	local checkVal=0
+	local isWinner=0
 	local whoseChanceIsIt=0
 	reset_the_board
 	local whoseChanceIsIt=$( toss_to_decide_who_plays_first )
 	chanceNumber=1
 	while [ $chanceNumber -le $MAX_CELLS_AVAILABLE ]
 	do
-		local cell=0
+		local cellNumber=0
 		display_the_board
 		if [ $whoseChanceIsIt == "user" ]
 		then
-			cell=$(user_chance)
-			insert_in_the_cell $cell $whoseChanceIsIt
-			checkVal=$(check_if_this_player_won $cell)
+			cellNumber=$(user_chance)
+			insert_in_the_cell $cellNumber $whoseChanceIsIt
+			isWinner=$(check_if_this_player_won $cellNumber)
 		else
-			cell=$(computer_chance $chanceNumber)
-			insert_in_the_cell $cell $whoseChanceIsIt
-			checkVal=$(check_if_this_player_won $cell)
+			cellNumber=$(computer_chance $chanceNumber)
+			insert_in_the_cell $cellNumber $whoseChanceIsIt
+			isWinner=$(check_if_this_player_won $cellNumber)
 		fi
-		if [ $checkVal -gt 0 ]
+		if [ $isWinner -gt 0 ]
 		then
 			display_the_board
 			local whoWon=$whoseChanceIsIt
