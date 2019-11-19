@@ -159,25 +159,42 @@ function user_chance(){
 	echo $chosenCell
 }
 
+function win_checker(){
+	local chosenCellForWinCheck=1
+	while [ $chosenCellForWinCheck -le $MAX_CELLS_AVAILABLE ]
+	do
+			if [[ ${ticTacToeBoard[$chosenCellForWinCheck]} =~ [1-9] ]]
+			then
+			winCell=$(check_win_possibility $chosenCellForWinCheck $1)
+		fi
+		if [ $winCell -gt 0 ]
+		then
+			echo $chosenCellForWinCheck
+			return
+		fi
+		((chosenCellForWinCheck++))
+	done
+	echo 0
+}
+
 #computer plays at random cell
 function computer_chance(){
 	local chosenCellComp=1
 	local winCell=0
-	if [ $1 -gt 4 ]
+	if [ $1 -ge 4 ]
 	then
-		while [ $chosenCellComp -le $MAX_CELLS_AVAILABLE ]
-		do
-			if [[ ${ticTacToeBoard[$chosenCellComp]} =~ [1-9] ]]
-			then
-				winCell=$(check_win_possibility $chosenCellComp $COMPUTER_SYMBOL)
-			fi
-			if [ $winCell -gt 0 ]
-			then
-				echo $chosenCellComp
-				return
-			fi
-			((chosenCellComp++))
-		done
+		ifCompCanWin=$(win_checker $COMPUTER_SYMBOL)
+		if [ $ifCompCanWin -gt 0 ]
+		then
+			echo $ifCompCanWin
+			return
+		fi
+		ifPlayerCanWin=$(win_checker $PLAYER_SYMBOL)
+		if [ $ifPlayerCanWin -gt 0 ]
+		then
+			echo $ifPlayerCanWin
+			return
+		fi
 	fi
 	while [ true ]
 	do
