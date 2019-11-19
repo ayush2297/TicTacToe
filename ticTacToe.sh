@@ -224,6 +224,9 @@ function computer_chance(){
 	do
 		local index=${sides[$i]}
 		if [[ ${ticTacToeBoard[$index]} != $PLAYER_SYMBOL && ${ticTacToeBoard[$index]} != $COMPUTER_SYMBOL ]]
+		then
+			ticTacToeBoard[$winCell]=$COMPUTER_SYMBOL
+		fi
 	done
 }
 
