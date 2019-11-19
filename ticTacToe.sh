@@ -209,7 +209,6 @@ function computer_chance(){
 			echo $ifPlayerCanWin
 			return
 		fi
-		echo 0
 	fi
 	playCornerCell=$(search_for_corner_cell_space )
 	if [ $playCornerCell -ne 0 ]
