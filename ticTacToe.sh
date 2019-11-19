@@ -1,6 +1,7 @@
 #! /bin/bash -x
 
 echo "tic-tac-toe game*************"
+
 #constants
 declare MAX_CELLS_AVAILABLE=9
 declare PLAYER_SYMBOL="X"
