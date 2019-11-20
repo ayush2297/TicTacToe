@@ -277,7 +277,7 @@ function the_main_exec_starts_here(){
 		playerSymbol="X"
 		computerSymbol="O"
 	else
-		playerSymbol="0"
+		playerSymbol="O"
 		computerSymbol="X"
 	fi
 	chanceNumber=1
