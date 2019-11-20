@@ -263,10 +263,12 @@ function the_main_exec_starts_here(){
 		display_the_board
 		if [ $whoseChanceIsIt == "user" ]
 		then
+			echo "user chance"
 			cellNumber=$(user_chance)
 			insert_in_the_cell $cellNumber $whoseChanceIsIt
 			isWinner=$(check_if_this_player_won $cellNumber)
 		else
+			echo "computer chance"
 			cellNumber=$(computer_chance $chanceNumber)
 			insert_in_the_cell $cellNumber $whoseChanceIsIt
 			isWinner=$(check_if_this_player_won $cellNumber)
