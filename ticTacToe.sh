@@ -4,8 +4,6 @@ echo "tic-tac-toe game*************"
 
 #constants
 declare MAX_CELLS_AVAILABLE=9
-declare PLAYER_SYMBOL="X"
-declare COMPUTER_SYMBOL="O"
 declare PLAYER_WINS="XXX"
 declare COMPUTER_WINS="OOO"
 declare CENTER_CELL=5
@@ -14,6 +12,11 @@ declare CENTER_CELL=5
 declare -a ticTacToeBoard
 declare -a cornerCells=([1]=1 [2]=3 [3]=7 [4]=9)
 declare -a sideCells=([1]=2 [2]=4 [3]=6 [4]=8)
+
+#variables
+declare playerSymbol=""
+declare computerSymbol=""
+
 
 #resets the board cells with initial values
 function reset_the_board(){
@@ -149,9 +152,9 @@ function insert_in_the_cell(){
 	local symbolToInsert=0
 	if [ $2 == "user" ]
 	then
-		symbolToInsert=$PLAYER_SYMBOL
+		symbolToInsert=$playerSymbol
 	else
-		symbolToInsert=$COMPUTER_SYMBOL
+		symbolToInsert=$computerSymbol
 	fi
 	if [[ ${ticTacToeBoard[$cellToInsertTheSymbol]} =~ [0-9] ]]
 	then
@@ -167,7 +170,7 @@ function user_chance(){
 		read -p "enter the position you want to play at: " chosenCell
 		if [[ $chosenCell -ge 1 ]] && [[ $chosenCell  -le 9 ]]
 		then
-			if [[ ${ticTacToeBoard[$chosenCell]} != $COMPUTER_SYMBOL ]] && [[ ${ticTacToeBoard[$chosenCell]} != $PLAYER_SYMBOL ]]
+			if [[ ${ticTacToeBoard[$chosenCell]} != $computerSymbol ]] && [[ ${ticTacToeBoard[$chosenCell]} != $playerSymbol ]]
 			then
 				break
 			fi
@@ -201,7 +204,7 @@ function search_for_corner_cell_space(){
 	for (( i=1 ; $i <= 4 ; i++ ))
 	do
 		index=${cornerCells[$i]}
-		if [[ ${ticTacToeBoard[$index]} != $PLAYER_SYMBOL ]] && [[ ${ticTacToeBoard[$index]} != $COMPUTER_SYMBOL ]]
+		if [[ ${ticTacToeBoard[$index]} != $playerSymbol ]] && [[ ${ticTacToeBoard[$index]} != $computerSymbol ]]
 		then
 			echo $index
 			return
@@ -219,13 +222,13 @@ function computer_chance(){
 	local playCornerCell=0
 	if [ $1 -ge 4 ]
 	then
-		ifCompCanWin=$(win_checker $COMPUTER_SYMBOL)
+		ifCompCanWin=$(win_checker $computerSymbol)
 		if [ $ifCompCanWin -gt 0 ]
 		then
 			echo $ifCompCanWin
 			return
 		fi
-		ifPlayerCanWin=$(win_checker $PLAYER_SYMBOL)
+		ifPlayerCanWin=$(win_checker $playerSymbol)
 		if [ $ifPlayerCanWin -gt 0 ]
 		then
 			echo $ifPlayerCanWin
@@ -237,7 +240,7 @@ function computer_chance(){
 	then
 		echo $playCornerCell
 		return
-	elif [[ ${ticTacToeBoard[$CENTER_CELL]} != $PLAYER_SYMBOL && ${ticTacToeBoard[$CENTER_CELL]} != $COMPUTER_SYMBOL ]]
+	elif [[ ${ticTacToeBoard[$CENTER_CELL]} != $playerSymbol && ${ticTacToeBoard[$CENTER_CELL]} != $computerSymbol ]]
 	then
 		echo $CENTER_CELL
 		return
@@ -245,7 +248,7 @@ function computer_chance(){
 	for (( i=1 ; $i<=4 ; i++ ))
 	do
 		local index=${sideCells[$i]}
-		if [[ ${ticTacToeBoard[$index]} != $PLAYER_SYMBOL && ${ticTacToeBoard[$index]} != $COMPUTER_SYMBOL ]]
+		if [[ ${ticTacToeBoard[$index]} != $playerSymbol && ${ticTacToeBoard[$index]} != $computerSymbol ]]
 		then
 			echo $index
 			return
@@ -269,6 +272,14 @@ function the_main_exec_starts_here(){
 	local whoseChanceIsIt=0
 	reset_the_board
 	local whoseChanceIsIt=$( toss_to_decide_who_plays_first )
+	if [ $whoseChanceIsIt == "user" ]
+	then
+		playerSymbol="X"
+		computerSymbol="O"
+	else
+		playerSymbol="0"
+		computerSymbol="X"
+	fi
 	chanceNumber=1
 	while [ $chanceNumber -le $MAX_CELLS_AVAILABLE ]
 	do
