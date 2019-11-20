@@ -10,7 +10,7 @@ declare PLAYER_WINS="XXX"
 declare COMPUTER_WINS="OOO"
 declare CENTER_CELL=5
 
-#arrays and dictionaries
+#arrays
 declare -a ticTacToeBoard
 declare -a cornerCells=([1]=1 [2]=3 [3]=7 [4]=9)
 declare -a sideCells=([1]=2 [2]=4 [3]=6 [4]=8)
@@ -111,8 +111,18 @@ function check_if_this_player_won(){
 	if [ $(($cell%2)) -eq 1  ]
 	then
 		winCheck=$(($winCheck+$(check_for_diagonal_win $cell) ))
+		if [ $winCheck != 0 ]
+		then
+			echo $winCheck
+			return
+		fi
 	fi
 	winCheck=$(($winCheck+$(check_for_row_win $cell) ))
+	if [ $winCheck != 0 ]
+	then
+		echo $winCheck
+		return
+	fi
 	winCheck=$(($winCheck+$(check_for_column_win	$cell) ))
 	echo $winCheck
 }
@@ -155,9 +165,12 @@ function user_chance(){
 	while [ true ]
 	do
 		read -p "enter the position you want to play at: " chosenCell
-		if [[ $chosenCell -ge 1 ]] && [[ $chosenCell  -le 9 ]] && [[ ${ticTacToeBoard[$chosenCell]} != $COMPUTER_SYMBOL ]]
+		if [[ $chosenCell -ge 1 ]] && [[ $chosenCell  -le 9 ]]
 		then
-			break
+			if [[ ${ticTacToeBoard[$chosenCell]} != $COMPUTER_SYMBOL ]] && [[ ${ticTacToeBoard[$chosenCell]} != $PLAYER_SYMBOL ]]
+			then
+				break
+			fi
 		fi
 	done
 	echo $chosenCell
