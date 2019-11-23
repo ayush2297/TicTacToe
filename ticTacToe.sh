@@ -146,6 +146,40 @@ function check_win_possibility(){
 	echo 0
 }
 
+#checks if corner cells are available. if yes then returns a corner cell
+function search_for_corner_cell_space(){
+	for (( i=1 ; $i <= 4 ; i++ ))
+	do
+		index=${cornerCells[$i]}
+		if [[ ${ticTacToeBoard[$index]} != $playerSymbol ]] && [[ ${ticTacToeBoard[$index]} != $computerSymbol ]]
+		then
+			echo $index
+			return
+		fi
+	done
+	echo 0
+}
+
+#to check if the given symbol->($1) player can win the game in the next chance
+function win_checker(){
+	local chosenCellForWinCheck=1
+	local winCell=0
+	while [ $chosenCellForWinCheck -le $MAX_CELLS_AVAILABLE ]
+	do
+		if [[ ${ticTacToeBoard[$chosenCellForWinCheck]} =~ [1-9] ]]
+		then
+			winCell=$(check_win_possibility $chosenCellForWinCheck $1)
+		fi
+		if [ $winCell -gt 0 ]
+		then
+			echo $chosenCellForWinCheck
+			return
+		fi
+		((chosenCellForWinCheck++))
+	done
+	echo 0
+}
+
 #to insert the specified symbol into the specified cell
 function insert_in_the_cell(){
 	local cellToInsertTheSymbol=$1
@@ -179,39 +213,6 @@ function user_chance(){
 	echo $chosenCell
 }
 
-#to check if the given symbol->($1) player can win the game in the next chance
-function win_checker(){
-	local chosenCellForWinCheck=1
-	local winCell=0
-	while [ $chosenCellForWinCheck -le $MAX_CELLS_AVAILABLE ]
-	do
-		if [[ ${ticTacToeBoard[$chosenCellForWinCheck]} =~ [1-9] ]]
-		then
-			winCell=$(check_win_possibility $chosenCellForWinCheck $1)
-		fi
-		if [ $winCell -gt 0 ]
-		then
-			echo $chosenCellForWinCheck
-			return
-		fi
-		((chosenCellForWinCheck++))
-	done
-	echo 0
-}
-
-#checks if corner cells are available. if yes then returns a corner cell
-function search_for_corner_cell_space(){
-	for (( i=1 ; $i <= 4 ; i++ ))
-	do
-		index=${cornerCells[$i]}
-		if [[ ${ticTacToeBoard[$index]} != $playerSymbol ]] && [[ ${ticTacToeBoard[$index]} != $computerSymbol ]]
-		then
-			echo $index
-			return
-		fi
-	done
-	echo 0
-}
 
 #computer choses to play winning move first followed by a blocking move to 
 #block the player from winning followed by playing on a corner cell
